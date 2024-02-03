@@ -7,3 +7,66 @@
  */
 #include <xinu.h>
 #include "ns16550.h"
+#include <xinu.h>
+
+#define UNGETMAX 10             // can un-get at most 10 characters
+static unsigned char ungetArray[UNGETMAX];
+static unsigned int bufp = 0;  // initialize buffer pointer to 0 
+
+syscall kgetc()
+{
+    volatile struct ns16550_uart_csreg *regptr;
+    regptr = (struct ns16550_uart_csreg *)UART_BASE;
+
+    // check the unget buffer for a character
+    if (buffp > 0) {
+        return ungetArray[--bufp];
+    }
+
+    // check UART line status register for data availability
+    while (!(regptr->lsr & 0x01)) {
+        // Wait for data to be available (or implement a timeout mechanism)
+    }
+
+    // read the character from the UART data register
+    return regptr->data;
+}
+/**
+ * kcheckc - check to see if a character is available.
+ * @return true if a character is available, false otherwise.
+ */
+syscall kcheckc(void)
+{
+    volatile struct ns16550_uart_csreg *regptr;
+    regptr = (struct ns16550_uart_csreg *)UART_BASE;
+
+    // Check the unget buffer for characters
+    if (bufp > 0) {
+        return TRUE;  // character available in the unget buffer
+    }
+
+    // check UART line status register for data availability
+    if (regptr->lsr & 0x01) {
+        return TRUE;  // Character available in the UART
+    }
+
+    // no characters available
+    return FALSE;
+}
+/**
+ * kungetc - put a serial character "back" into a local buffer.
+ * @param c character to unget.
+ * @return c on success, SYSERR on failure.
+ */
+syscall kungetc(unsigned char c)
+{
+    // check if there is room in the unget buffer
+    if (bufp < UNGETMAX) {
+        // put the character into the unget buffer
+        ungetArray[bufp++] = c;
+        return c;
+    } else {
+        // discard the character if the unget buffer is full
+        return SYSERR;
+    }
+}
