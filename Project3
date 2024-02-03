@@ -6,6 +6,7 @@
  * TA-BOT:MAILTO [your email address]
  */
 #include <xinu.h>
+#include "ns16550.h"
 
 #define UNGETMAX 10             /* Can un-get at most 10 characters. */
 static unsigned char ungetArray[UNGETMAX];
