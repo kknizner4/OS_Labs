@@ -65,7 +65,11 @@ syscall kputc(uchar c)
     regptr = (struct ns16550_uart_csreg *)UART_BASE;
 
     // TODO: Check UART line status register.
-    //       Once the Transmitter FIFO is empty, send character c.
+    while (!(regptr->lsr & 0x20)) {
+        // wait for transmitter FIFO to be empty (or implement a timeout mechanism)
+    }
+    // Once the Transmitter FIFO is empty, send character c.
+    regptr->data = c;
 
     return c;
 }
