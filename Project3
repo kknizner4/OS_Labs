@@ -6,47 +6,4 @@
  * TA-BOT:MAILTO [your email address]
  */
 #include <xinu.h>
-
-/* Define UART registers (replace these with actual addresses) */
-#define UART_BASE_ADDRESS   0x2500000
-#define UART_DATA_REGISTER  //reg value
-#define UART_LSR_REGISTER   //reg value
-
-// kputc - writes one character to the serial port
-syscall kputc(byte c)
-{
-    // wait until the UART is ready to accept a character
-    while (! (inb(UART_LSR_REGISTER) & 0x20)) {
-    // implement wait
-    }
-    // write the character to the UART data register
-    outb(UART_DATA_REGISTER, c);
-
-    return OK;
-}
-// kgetc - reads one character from the serial port
-syscall kgetc(void)
-{
-    // wait until a character is available in the UART
-    while (! (inb(UART_LSR_REGISTER) & 0x01)) {
-        // wait
-    }
-
-    // read the character from the UART data register
-    return inb(UART_DATA_REGISTER);
-}
-
-// kungetc - put a character back onto the serial port input
-syscall kungetc(byte c)
-{
-    // implement code to put a character back into the UART input.
-
-    return OK;
-}
-
-// kcheckc - check if a character is available from the serial port
-syscall kcheckc(void)
-{
-    // check if a character is available in the UART
-    return (inb(UART_LSR_REGISTER) & 0x01) ? TRUE : FALSE;
-}
+#include "ns16550.h"
