@@ -3,6 +3,11 @@
  * @provides create, newpid, userret
  *
  * COSC 3250 Assignment 4
+ * @author Max Marquez and Katie Knizner
+ * Instructor Dr. Brylow
+ * TA-BOT:MAILTO kathleen.knizner@marquette.edu
+ * TA-BOT:MAILTO maximillian.marquez@marquette.edu
+ */
  */
 /* Embedded XINU, Copyright (C) 2008.  All rights reserved. */
 
