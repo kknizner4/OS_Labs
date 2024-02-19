@@ -49,14 +49,14 @@ str s5, [sp, #CTX_S5*4]
 str s4, [sp, #CTX_S4*4]
 str lr, [sp, #CTX_PC*4]
 
-str sp, [r0]
+str sp, [s0]
 
 // TODO: Restore process state, including at least the
 //      callee-save ("non-volatile") registers.
 //      These call and restore segments must match the register data
 //      layout you choose in create().
 
-ldr sp, [r1]
+ldr sp, [s1]
 ldr s0, [sp, #CTX_S0*4]
 ldr s1, [sp, #CTX_S1*4]
 ldr s2, [sp, #CTX_S2*4]
@@ -74,7 +74,7 @@ ldr lr, [sp, #CTX_LR*4]
 
 add sp, sp, #64
 
-bx r12
+bx s12
 
 // TODO: Jump to next function.
 //      Note: there are two important values at play here --
