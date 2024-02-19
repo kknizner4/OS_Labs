@@ -50,7 +50,7 @@ syscall create(void *funcaddr, ulong ssize, char *name, ulong nargs, ...)
     numproc++;
     ppcb = &proctab[pid];
        // TODO: Setup PCB entry for new process.
-    
+    strncpy(ppcb->name, name, PNMLEN);
     ppcb -> state = PRSUSP;
     ppcb -> stkbase = saddr;
     ppcb -> stklen = (ulong *)(saddr - ssize*4); //just setting base size 
