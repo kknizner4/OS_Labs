@@ -35,46 +35,48 @@ ctxsw:
 // TODO: Save process state, including at least the 
 //      callee-save ("non-volatile") registers.
 
+//allocate storage for the stack
 add sp, sp, #-64
 
-// non-volatile registers is CTX_Sx
+// Save callee-save registers (s0-s11) and the return address (lr)
+    str s11, [sp, #CTX_S11*4]
+    str s10, [sp, #CTX_S10*4]
+    str s9, [sp, #CTX_S9*4]
+    str s8, [sp, #CTX_S8*4]
+    str s7, [sp, #CTX_S7*4]
+    str s6, [sp, #CTX_S6*4]
+    str s5, [sp, #CTX_S5*4]
+    str s4, [sp, #CTX_S4*4]
+    str lr, [sp, #CTX_RA*4] // CTX_RA for saving the return address
 
-str s11, [sp, #CTX_S11*4]
-str s10, [sp, #CTX_S10*4]
-str s9, [sp, #CTX_S9*4]
-str s8, [sp, #CTX_S8*4]
-str s7, [sp, #CTX_S7*4]
-str s6, [sp, #CTX_S6*4]
-str s5, [sp, #CTX_S5*4]
-str s4, [sp, #CTX_S4*4]
-str lr, [sp, #CTX_PC*4]
-
-str sp, [s0]
+    // Save the current stack pointer (sp) in s0
+    str sp, [s0]
 
 // TODO: Restore process state, including at least the
 //      callee-save ("non-volatile") registers.
 //      These call and restore segments must match the register data
 //      layout you choose in create().
 
-ldr sp, [s1]
-ldr s0, [sp, #CTX_S0*4]
-ldr s1, [sp, #CTX_S1*4]
-ldr s2, [sp, #CTX_S2*4]
-ldr s3, [sp, #CTX_S3*4]
-ldr s4, [sp, #CTX_S4*4]
-ldr s5, [sp, #CTX_S5*4]
-ldr s6, [sp, #CTX_S6*4]
-ldr s7, [sp, #CTX_S7*4]
-ldr s8, [sp, #CTX_S8*4]
-ldr s9, [sp, #CTX_S9*4]
-ldr s10, [sp, #CTX_S10*4]
-ldr s11, [sp, #CTX_S11*4]
-ldr s12, [sp, #CTX_PC*4]
-ldr lr, [sp, #CTX_LR*4] 
+ // load the new stack pointer (sp) from the new stack save area
+    ldr sp, [s1]
 
-add sp, sp, #64
+    // Restore callee-save registers (s0-s11) and the return address (lr)
+    ldr s0, [sp, #CTX_S0*4]
+    ldr s1, [sp, #CTX_S1*4]
+    ldr s2, [sp, #CTX_S2*4]
+    ldr s3, [sp, #CTX_S3*4]
+    ldr s4, [sp, #CTX_S4*4]
+    ldr s5, [sp, #CTX_S5*4]
+    ldr s6, [sp, #CTX_S6*4]
+    ldr s7, [sp, #CTX_S7*4]
+    ldr s8, [sp, #CTX_S8*4]
+    ldr s9, [sp, #CTX_S9*4]
+    ldr s10, [sp, #CTX_S10*4]
+    ldr s11, [sp, #CTX_S11*4]
+    ldr lr, [sp, #CTX_RA*4] 
 
-bx s12
+// deallocate space for saved registers on the stack
+    add sp, sp, #64
 
 // TODO: Jump to next function.
 //      Note: there are two important values at play here --
@@ -84,6 +86,7 @@ bx s12
 //      for the very first time we ctxsw() to a new process, when they
 //      are different.  See create() for more details.
 
+bx lr
 // Note: This ret line immediately returns from whence we came.  This
 //      is here as a placeholder so that you don't crash your O/S when
 //      you call ctxsw() before it is complete.  But, this line of code
