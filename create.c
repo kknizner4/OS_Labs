@@ -81,34 +81,18 @@ syscall create(void *funcaddr, ulong ssize, char *name, ulong nargs, ...)
     *--saddr = (ulong)funcaddr;
     // set the return address to the userret function
     *--saddr = (ulong)&userret;
-    // place arguments into the activation record and initialize va_list for variable arguments
-    va_list ap;
-    va_start(ap, nargs);
-
-    // loop through arguments and push them onto the stack
-    for (i = 0; i < nargs && i < 4; i++) {
-    *--saddr = va_arg(ap, ulong);
-    }
-
-    //finish handling arguments
-    va_end(ap);
-
-    // fill the remaining slots with zeros if necessary
-    for (i = 0; i < pads; i++) {
-        *--saddr = 0;
-    }
 
     // fill spots for registers with 0s or first 4 arguments appropriately
     for (i = 0; i < pads; i++)
     {
         *--saddr = 0;
     }
-
    
         // TODO:  Place arguments into activation record.
         //        See K&R 7.3 for example using va_start, va_arg and
         //        va_end macros for variable argument functions.
-
+    va_list ap;
+    va_start(ap, nargs);
   for (i = 0; i < nargs && i < 4; i++) {
         *--saddr = va_arg(ap, ulong);
     }
