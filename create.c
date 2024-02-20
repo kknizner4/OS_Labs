@@ -50,11 +50,11 @@ syscall create(void *funcaddr, ulong ssize, char *name, ulong nargs, ...)
     numproc++;
     ppcb = &proctab[pid];
        // TODO: Setup PCB entry for new process.
-   strncpy(ppcb->name, name, PNMLEN);
-    ppcb->state = PRSUSP;
-    ppcb->stkbase = saddr;
-    ppcb->stklen = ssize;
-    ppcb->stkptr = saddr + ssize / sizeof(ulong); 
+   strncpy(ppcb->name, name, PNMLEN); // copy process name
+    ppcb->state = PRSUSP;               // set process state to suspended
+    ppcb->stkbase = saddr;              // set stack base address
+    ppcb->stklen = ssize;               // set stack length
+    ppcb->stkptr = saddr + ssize / sizeof(ulong); // set stack pointer
     
     
     /* Initialize stack with accounting block. */
