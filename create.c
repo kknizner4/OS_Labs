@@ -50,11 +50,12 @@ syscall create(void *funcaddr, ulong ssize, char *name, ulong nargs, ...)
     numproc++;
     ppcb = &proctab[pid];
        // TODO: Setup PCB entry for new process.
-    strncpy(ppcb->name, name, PNMLEN);
-    ppcb -> state = PRSUSP;
-    ppcb -> stkbase = saddr;
-    ppcb -> stklen = (ulong *)(saddr - ssize*4); //just setting base size 
-    ppcb -> stkptr = ppcb -> stkbase + ppcb-> stklen;
+   strncpy(ppcb->name, name, PNMLEN);
+    ppcb->state = PRSUSP;
+    ppcb->stkbase = saddr;
+    ppcb->stklen = ssize;
+    ppcb->stkptr = saddr + ssize / sizeof(ulong); 
+    
     
     /* Initialize stack with accounting block. */
     *saddr = STACKMAGIC;
@@ -76,42 +77,42 @@ syscall create(void *funcaddr, ulong ssize, char *name, ulong nargs, ...)
 
         // TODO: Initialize process context.
         //
-    *--saddr = funcaddr;
-    *--saddr = &userret;
+    // set the initial program counter (PC) to the function address
+    *--saddr = (ulong)funcaddr;
+    // set the return address to the userret function
+    *--saddr = (ulong)&userret;
+    // place arguments into the activation record and initialize va_list for variable arguments
+    va_list ap;
+    va_start(ap, nargs);
 
-      int arg1 = 0;
-      int arg2 = 0;
-      int arg3 = 0;
-      int arg4 = 0;
-      if (nargs >= 1)
-        arg1 = va_arg(ap,int);
-      if (nargs >= 2)
-        arg2 = va_arg(ap,int);
-      if (nargs >= 3)
-        arg3 = va_arg(ap,int);
-      if (nargs >= 4)
-        arg4 = va_arg(ap,int);
-
-// fill spots for registers with 0s or first 4 arguments appropriately
-    for (i = 0; i < 14; i++ ){
-        if ( i == 13 ) {
-            *--saddr = arg1;
-        } else if ( i == 12) {
-            *--saddr = arg2;
-        } else if ( i == 11) {
-            *--saddr = arg3;
-        } else if ( i == 10) {
-            *--saddr = arg4;
-        } else {
-            *--saddr = 0;
-        }
+    // loop through arguments and push them onto the stack
+    for (i = 0; i < nargs && i < 4; i++) {
+    *--saddr = va_arg(ap, ulong);
     }
+
+    //finish handling arguments
+    va_end(ap);
+
+    // fill the remaining slots with zeros if necessary
+    for (i = 0; i < pads; i++) {
+        *--saddr = 0;
+    }
+
+    // fill spots for registers with 0s or first 4 arguments appropriately
+    for (i = 0; i < pads; i++)
+    {
+        *--saddr = 0;
+    }
+
+   
         // TODO:  Place arguments into activation record.
         //        See K&R 7.3 for example using va_start, va_arg and
         //        va_end macros for variable argument functions.
 
-   for (i = 4; i < nargs; i++)
-        argumentpointer[i-4] = va_arg(ap, int);
+  for (i = 0; i < nargs && i < 4; i++) {
+        *--saddr = va_arg(ap, ulong);
+    }
+
     va_end(ap);
     ppcb->stkptr = saddr;
     
