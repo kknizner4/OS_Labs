@@ -81,6 +81,7 @@ void printpcb(int pid)
     kprintf("Base of run time stack    : 0x%08X \r\n", ppcb->stkbase);
     kprintf("Stack length of process   : %8u \r\n", ppcb->stklen);
 }
+
 /**
  * testcases - called after initialization completes to test things.
  */
@@ -113,12 +114,14 @@ void testcases(void)
                      0x99999999, 0x10101010, 0x11111111, 0x12121212,
                      0x13131313, 0x14141414, 0x15151515, 0x16161616);
         printpcb(pid);
-        // TODO: print out stack with extra args
-        // TODO: ready(pid, RESCHED_YES);
+        // Print out stack with extra arguments
+        kprintf("Stack of process %d:\r\n", pid);
+        printstk(pid);
+        ready(pid, RESCHED_YES); // Schedule the process
         break;
 
     case '2':
-// Create three copies of a process, and let them play.
+        // Create three copies of a process, and let them play.
         ready(create((void *)testmain, INITSTK, "MAIN1", 2, 0, NULL),
               RESCHED_NO);
         ready(create((void *)testmain, INITSTK, "MAIN2", 2, 0, NULL),
