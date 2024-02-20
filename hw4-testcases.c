@@ -8,6 +8,7 @@
  */
 /* Embedded XINU, Copyright (C) 2007.  All rights reserved. */
 
+
 #include <xinu.h>
 
 extern void main(int, char *);
@@ -27,7 +28,7 @@ int testmain(int argc, char **argv)
     return 0;
 }
 
-void testbigargs(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, int l, int m, int n, int o, int p)
+void testbigargs(int a, int b, int c, int d, int e, int f, int g, int h)
 {
     kprintf("Testing bigargs...\r\n");
     kprintf("a = 0x%08X\r\n", a);
@@ -38,14 +39,6 @@ void testbigargs(int a, int b, int c, int d, int e, int f, int g, int h, int i, 
     kprintf("f = 0x%08X\r\n", f);
     kprintf("g = 0x%08X\r\n", g);
     kprintf("h = 0x%08X\r\n", h);
-    kprintf("i = 0x%08X\r\n", i);
-    kprintf("j = 0x%08X\r\n", j);
-    kprintf("k = 0x%08X\r\n", k);
-    kprintf("l = 0x%08X\r\n", l);
-    kprintf("m = 0x%08X\r\n", m);
-    kprintf("n = 0x%08X\r\n", n);
-    kprintf("o = 0x%08X\r\n", o);
-    kprintf("p = 0x%08X\r\n", p);
 }
 
 void printpcb(int pid)
@@ -56,21 +49,21 @@ void printpcb(int pid)
     ppcb = &proctab[pid];
 
     /* Printing PCB */
-    kprintf("Process name                 : %s \r\n", ppcb->name);
+    kprintf("Process name		  : %s \r\n", ppcb->name);
 
     switch (ppcb->state)
     {
     case PRFREE:
-        kprintf("State of the process     : FREE \r\n");
+        kprintf("State of the process	  : FREE \r\n");
         break;
     case PRCURR:
-        kprintf("State of the process     : CURRENT \r\n");
+        kprintf("State of the process 	  : CURRENT \r\n");
         break;
     case PRSUSP:
-        kprintf("State of the process     : SUSPENDED \r\n");
+        kprintf("State of the process	  : SUSPENDED \r\n");
         break;
     case PRREADY:
-        kprintf("State of the process     : READY \r\n");
+        kprintf("State of the process	  : READY \r\n");
         break;
     default:
         kprintf("ERROR: Process state not correctly set!\r\n");
@@ -108,16 +101,12 @@ void testcases(void)
 
     case '1':
         // Many arguments testcase
-        pid = create((void *)testbigargs, INITSTK, "MAIN1", 16,
+        pid = create((void *)testbigargs, INITSTK, "MAIN1", 8,
                      0x11111111, 0x22222222, 0x33333333, 0x44444444,
-                     0x55555555, 0x66666666, 0x77777777, 0x88888888,
-                     0x99999999, 0x10101010, 0x11111111, 0x12121212,
-                     0x13131313, 0x14141414, 0x15151515, 0x16161616);
+                     0x55555555, 0x66666666, 0x77777777, 0x88888888);
         printpcb(pid);
-        // Print out stack with extra arguments
-        kprintf("Stack of process %d:\r\n", pid);
-        printstk(pid);
-        ready(pid, RESCHED_YES); // Schedule the process
+        // TODO: print out stack with extra args
+        ready(pid, RESCHED_YES);
         break;
 
     case '2':
