@@ -22,7 +22,7 @@ int testmain(int argc, char **argv)
         kprintf("This is process %d\r\n", currpid);
 
         /* Uncomment the resched() line for cooperative scheduling. */
-        // resched();
+        resched();
     }
     return 0;
 }
